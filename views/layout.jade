@@ -4,8 +4,18 @@ html
     title= title
     meta(name="viewport", content="width=device-width, initial-scale=1")
     link(rel='stylesheet', href='/stylesheets/style.css')
-    script(src="/socket.io.js")
-    script()
+    script(src="/socket.io/socket.io.js")
+    script(src="https://code.jquery.com/jquery-1.11.1.js")
+    script.
+      $(function () {
+      var socket = io();
+      $('form').submit(function(){
+      socket.emit('chat message', $('#m').val());
+      $('#m').val('');
+      return false;
+      });
+      });
+
 
   body
     block content
