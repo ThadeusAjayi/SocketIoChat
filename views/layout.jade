@@ -7,17 +7,63 @@ html
     script(src="/socket.io/socket.io.js")
     script(src="https://code.jquery.com/jquery-1.11.1.js")
     script.
+      var socket = io();
+      var user = "matilda@gmail.com";//Front-end should implement this rather than static
+      var currentObj;
+      var currentChat;
       $(function () {
-        var socket = io();
-        $('form').submit(function(){
-          socket.emit('chat message', $('#m').val());
-          $('#m').val('');
-          return false;
-        });
-        socket.on('chat message', function(msg){
-          $('#messages').append($('<li>').text(msg));
-        });
+      $('form').submit(function () {
+      var chatMsg = {
+      message: $('#m').val(),
+      sender: user
+      }
+      socket.emit('chatMessage', chatMsg);
+      $('#m').val('');
+      return false;
       });
+      socket.emit("setLoggedUserEmail", user);
+      socket.on('returnAllChats', (chats) => {
+      if (currentObj !== undefined) {
+      return;
+      } else {
+      currentObj = chats;
+      var count = 0;
+      chats.forEach(chat => {
+      $('#chatlist').append($('<li id="' + count + '">').text(chat.chatwith));
+      count++;
+      });
+      }
+      });
+      socket.on('chatMessage', function (msg) {
+      console.table(msg);
+      $('#messages').append($("<li>").text(msg.message));
+      });
+      $('#chatlist').on('click', 'li', function () {
+      var attr = $(this).attr('id');
+      socket.emit('getChat', currentObj[attr]._id);
+      });
+      socket.on('getChat', (chatArray) => {
+      if (currentChat !== undefined) {
+      return;
+      } else {
+      currentChat = chatArray;
+      chatArray[0].chatmessages.forEach(chat => {
+      $('#messages').append($("<li>").text(chat.message));
+      });
+      }
+      });
+      });
+      function createChat() {
+      var chatnew = {
+      createdby: user,
+      chatwith: "ainojie@gmail.com"
+      }
+      socket.emit("CreateChat", chatnew);
+      socket.on("CreateChat", (message) => {
+      document.getElementById("thoseViews").style.display = "none";
+      console.log(message);
+      });
+      }
 
 
   body

@@ -1,21 +1,70 @@
+var mongoose = require('mongoose');
+var User = require('./user_model');
 var io = require('socket.io')();
 
+
+//Get all chats related to a user
 io.on('connection', function (socket) {
+    var currentChatId;
+    var currentUserEmail;
+    var connectedUsers = [];
+    socket.emit("userConnected", "Connected to server");
 
-    socket.emit('news', { hello: 'world' });
-  
-    socket.on('my other event', function (data) {
-      console.log(data);
+    
+    socket.on("setLoggedUserEmail", (data) => {
+        console.log(data + " Connected");
+        currentUserEmail = data;
+        //Get all connected users whenever the join and update a list of users online
+        connectedUsers.push(currentUserEmail);
+        Chat.find({}, { createdby: data, chatwith: data }, (err, chats) => {
+            if (err) return err;
+            io.emit('returnAllChats', chats);
+        });
     });
-  
-    socket.on('chat message', function(msg){
-      console.log('message: ' + msg);
-      io.emit('chat message', msg);
+    /* Chat creation is done from where all the mentors are listed somewhere different */
+
+    socket.on('chatMessage', (data) => {
+        data[0].createdAt = new Date();
+        console.log(data);
+        Chat.update({ _id: currentChatId }, { $addToSet: { "chatmessages": data } }, (err, cm) => {
+            if (err) console.log(err.message);
+            io.emit('chatMessage', data);
+        });
     });
-  
+
+    socket.on("CreateChat", (newChat) => {
+        console.log(newChat);
+        var chat = new Chat(newChat);
+        Chat.create(chat, (err, chat) => {
+            if(err) return err.message;
+            io.emit("CreateChat", chat);
+            currentChatId = chat._id;
+        });
+        
+    });
+
+    socket.on('getChat', (chatId) => {
+        Chat.find({_id : chatId}, (err, chatObj) => {
+            if (err) return err;
+            io.emit('getChat', chatObj);
+            currentChatId =  chatId;
+        });
+    });
+
     socket.on('disconnect', function () {
-      console.log('user disconnected');
+        connectedUsers.pop(currentUserEmail);
+        console.log('user disconnected');
     });
-  });
+});
 
-module.exports = io;
+
+
+var ChatSchema = new mongoose.Schema({
+  chatmessages: [],
+  chatwith: String, //use email for uniqueness
+  createdby: String //use email for uniqueness
+});
+
+var Chat = mongoose.model('Chat', ChatSchema);
+
+module.exports.io = io;
