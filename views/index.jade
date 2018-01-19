@@ -2,7 +2,20 @@ extends layout
 
 block content
 
-  ul#messages
-  form(action='')
-    input#m(autocomplete='off')
-    button Send 
+  #chats
+    ul#chatlist
+    |         
+    input(value="ChatList", type="button", onclick="selectChat()")
+  |     
+  #thoseViews
+    input#newChat(type="text", placeholder="Chat name")
+    |         
+    input(value="PickChat", type="button", onclick="createChat()")
+  |     
+  .chatView
+    ul#messages
+    |         
+    form(action="")
+      input#m(autocomplete="off")
+      |             
+      button Send 

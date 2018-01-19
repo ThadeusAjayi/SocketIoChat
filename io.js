@@ -24,11 +24,11 @@ io.on('connection', function (socket) {
     /* Chat creation is done from where all the mentors are listed somewhere different */
 
     socket.on('chatMessage', (data) => {
-        data[0].createdAt = new Date();
-        console.log(data);
-        Chat.update({ _id: currentChatId }, { $addToSet: { "chatmessages": data } }, (err, cm) => {
+        var newChat = addDateToChat(data);
+        console.log(newChat);
+        Chat.update({ _id: currentChatId }, { $addToSet: { "chatmessages": newChat } }, (err, cm) => {
             if (err) console.log(err.message);
-            io.emit('chatMessage', data);
+            io.emit('chatMessage', newChat);
         });
     });
 
@@ -56,6 +56,15 @@ io.on('connection', function (socket) {
         console.log('user disconnected');
     });
 });
+
+function addDateToChat (chat) {
+  var newChat = {};
+  newChat.message = chat.message;
+  newChat.sender = chat.sender;
+  newChat.createdAt = new Date();
+
+  return newChat;
+}
 
 
 

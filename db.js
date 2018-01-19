@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-const MONGODB_URI = "mongodb://learn_by_olango:olango_learn@ds119476.mlab.com:19476/olango";
+const MONGODB_URI = "mongodb://iochatsocket:palleter1@ds153577.mlab.com:53577/io-chat-socket";
 
 mongoose.connect(MONGODB_URI);
 
