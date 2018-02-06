@@ -10,7 +10,7 @@ io.on('connection', function (socket) {
     var connectedUsers = [];
     socket.emit("userConnected", "Connected to server");
 
-    
+
     socket.on("setLoggedUserEmail", (data) => {
         console.log(data + " Connected");
         currentUserEmail = data;
@@ -36,18 +36,18 @@ io.on('connection', function (socket) {
         console.log(newChat);
         var chat = new Chat(newChat);
         Chat.create(chat, (err, chat) => {
-            if(err) return err.message;
+            if (err) return err.message;
             io.emit("CreateChat", chat);
             currentChatId = chat._id;
         });
-        
+
     });
 
     socket.on('getChat', (chatId) => {
-        Chat.find({_id : chatId}, (err, chatObj) => {
+        Chat.find({ _id: chatId }, (err, chatObj) => {
             if (err) return err;
             io.emit('getChat', chatObj);
-            currentChatId =  chatId;
+            currentChatId = chatId;
         });
     });
 
@@ -57,22 +57,23 @@ io.on('connection', function (socket) {
     });
 });
 
-function addDateToChat (chat) {
-    console.log(chat);
-  var newChat = {};
-  newChat.message = chat.message;
-  newChat.sender = chat.sender;
-  newChat.createdAt = new Date();
+function addDateToChat(chat) {
+    var chatObj = JSON.parse(chat.toString());
+    console.log(chatObj);
+    var newChat = {};
+    newChat.message = chatObj.message;
+    newChat.sender = chatObj.sender;
+    newChat.createdAt = new Date();
 
-  return newChat;
+    return newChat;
 }
 
 
 
 var ChatSchema = new mongoose.Schema({
-  chatmessages: [],
-  chatwith: String, //use email for uniqueness
-  createdby: String //use email for uniqueness
+    chatmessages: [],
+    chatwith: String, //use email for uniqueness
+    createdby: String //use email for uniqueness
 });
 
 var Chat = mongoose.model('Chat', ChatSchema);
