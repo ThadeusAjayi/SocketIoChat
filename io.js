@@ -24,7 +24,6 @@ io.on('connection', function (socket) {
     /* Chat creation is done from where all the mentors are listed somewhere different */
 
     socket.on('chatMessage', (data) => {
-        console.log(data);
         var newChat = addDateToChat(data);
         console.log(newChat);
         Chat.update({ _id: currentChatId }, { $addToSet: { "chatmessages": newChat } }, (err, cm) => {
@@ -59,6 +58,7 @@ io.on('connection', function (socket) {
 });
 
 function addDateToChat (chat) {
+    console.log(chat);
   var newChat = {};
   newChat.message = chat.message;
   newChat.sender = chat.sender;
