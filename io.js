@@ -58,12 +58,22 @@ io.on('connection', function (socket) {
 });
 
 function addDateToChat(chat) {
-    var chatObj = JSON.parse(chat.toString());
-    console.log(chatObj);
-    var newChat = {};
-    newChat.message = chatObj.message;
-    newChat.sender = chatObj.sender;
-    newChat.createdAt = new Date();
+    if (chat instanceof Object) {
+        var chatObj = chat;
+        console.log(chatObj);
+        var newChat = {};
+        newChat.message = chatObj.message;
+        newChat.sender = chatObj.sender;
+        newChat.createdAt = new Date();
+    } else {
+        var chatObj = JSON.parse(chat.toString());
+        console.log(chatObj);
+        var newChat = {};
+        newChat.message = chatObj.message;
+        newChat.sender = chatObj.sender;
+        newChat.createdAt = new Date();
+    }
+
 
     return newChat;
 }
